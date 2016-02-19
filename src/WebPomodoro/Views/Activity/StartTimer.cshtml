@@ -1,0 +1,71 @@
+﻿@model Activity
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">@ViewData["Title"]</h4>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" asp-for="ID" />
+            <form id="frmTimer" class="form-horizontal">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <strong>Activity: </strong>@Model.Description
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <canvas id="myCanvas" width=200 height=200></canvas>
+                            </div>
+                            <div class="col-sm-4">
+                                <p>
+                                    <a id="btnInterrupt" class="btn btn-success">Interruption</a>
+                                </p>
+                                <p>
+                                    <a id="btnAbandon" class="btn btn-danger">Abandoned</a>
+                                </p>    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="clearfix"></div>
+        </div>
+        <div class="modal-footer">
+            <button id="btnOk" type="button" class="btn btn-primary">OK</button>
+            <button id="btnCancel" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function Done() {
+        console.log("I am Done!");
+        alert("Time is up!");
+    }
+
+    var countDown = new CountDown(document.getElementById("myCanvas"), 25, Done);
+    countDown.Start();
+    
+    $("btnInterrupt").click(function () {
+        
+    });
+
+    $("btnAbandon").click(function () {
+
+    });
+
+    $("#btnOk").click(function () {
+        countDown.Stop();
+        $("#dialog").modal("hide");
+        location.reload();
+    });
+
+    $("#btnCancel").click(function () {
+        countDown.Stop();
+        $("#dialog").modal("hide");
+    });
+
+</script>

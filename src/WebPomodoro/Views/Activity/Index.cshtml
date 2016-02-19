@@ -1,0 +1,113 @@
+﻿@model IEnumerable<Activity>
+
+    @{
+    ViewData["Title"] = "Activity List";
+    }
+
+    <h2>TODO TODAY</h2>
+    <p>Activity that I need to do today.</p>
+
+    <table class="table table-striped table-hover">
+        <tr>
+            <th>Done</th>
+            <th>@Html.DisplayNameFor(model => model.Description)</th>
+            <th>@Html.DisplayNameFor(model => model.Place)</th>
+            <th>@Html.DisplayNameFor(model => model.ActivityDate)</th>
+            <th></th>
+        </tr>
+        @foreach (var act in Model) {
+        <tr>
+            <td>
+                <input type="checkbox" />
+            </td>
+            <td>
+                <a asp-action="StartTimer" asp-route-id="@act.ID" class="starttimer" data-ajax="true" data-toggle="modal" data-target="#dialog">
+                    <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                </a>
+                <a asp-action="Edit" asp-route-id="@act.ID" class="edit" data-ajax="true" data-toggle="modal" data-target="#dialog">
+                    @Html.DisplayFor(modelItem => act.Description)
+                </a>
+            </td>
+            <td>@Html.DisplayFor(modelItem => act.Place)</td>
+            <td>@Html.DisplayFor(modelItem => act.ActivityDate)</td>
+            <td class="text-center">
+                <a asp-action="Delete" asp-route-id="@act.ID" class="delete" data-ajax="true" data-toggle="modal" data-target="#dialog">
+                    <span class="glyphicon glyphicon-minus-sign" aria-hidden="true"></span>
+                </a>
+            </td>
+        </tr>
+        }
+    </table>
+    <button id="btnAdd" class="btn btn-primary" data-toggle="modal" data-target="#dialog" data-ajax="true">
+        <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Add Activity
+    </button>
+
+    @section scripts{
+        <script>
+            function refreshTable() {
+                //triggers update event to refresh the UserList table data
+                table.trigger('update');
+            }
+
+            $(".edit").click(function () {
+                $.ajax({
+                    url: $(this).prop("href"),
+                    type: "GET",
+                    cache: false,
+                    success: function (data) {
+                        $("#dialog").html(data);
+                    },
+                    error: function (xhr, state, thrownError) {
+                        $("#dialog").html(JSON.stringify(xhr));
+                    }
+                });
+            });
+
+            $(".delete").click(function () {
+                $.ajax({
+                    url: $(this).prop("href"),
+                    type: "GET",
+                    cache: false,
+                    success: function (data) {
+                        $("#dialog").html(data);
+                    },
+                    error: function (xhr, state, thrownError) {
+                        $("#dialog").html(JSON.stringify(xhr));
+                    }
+                });
+            });
+
+
+            $("#btnAdd").click(function () {
+                $.ajax({
+                    url: '@Url.Action("Edit", "Activity", new {id=-1})',
+                    type: "GET",
+                    cache: false,
+                    success: function (data) {
+                        $("#dialog").html(data);
+                    },
+                    error: function (xhr, state, thrownError) {
+                        $("#dialog").html(JSON.stringify(xhr));
+                    }
+                });
+            });
+
+            $(".starttimer").click(function () {
+                $.ajax({
+                    url: $(this).prop("href"),
+                    type: "GET",
+                    cache: false,
+                    success: function (data) {
+                        $("#dialog").html(data);
+                    },
+                    error: function (xhr, state, thrownError) {
+                        $("#dialog").html(JSON.stringify(xhr));
+                    }
+                });
+            });
+
+            $(function () {
+                //document is ready. 
+            });
+        </script>
+    }

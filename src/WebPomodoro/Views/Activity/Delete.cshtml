@@ -1,0 +1,43 @@
+﻿@model Activity
+
+@{
+    ViewData["Title"] = "Delete Activity";
+}
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Deletet Activity</h4>
+        </div>
+        <div class="modal-body">
+            <form id="frmEdit" class="form-horizontal">
+                <input type="hidden" asp-for="ID" />
+                <div>Are you sure you want to delete <strong>@Model.Description</strong>?</div>
+            </form>
+            <div class="clearfix"></div>
+        </div>
+        <div class="modal-footer">
+            <button id="btnOk" type="button" class="btn btn-primary">OK</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    $("#btnOk").on("click", function () {
+        $.ajax({
+            url: '@Url.Action("Delete", "Activity")',
+            data: $("#frmEdit").serialize(),
+            type: "POST",
+            success: function (data) {
+                if (data.result == "valid") {
+                    $("#dialog").modal("hide");
+                    location.reload();
+                } else {
+                    $("#dialog").html(data);
+                }
+            }
+        });
+    });
+</script>
