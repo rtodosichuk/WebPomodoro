@@ -20,9 +20,9 @@
         var runTime = Number(endTime) - Number(curTime);
         return runTime;
     }
-    TicksToTime(ticksInSecs) :string {
+    ConvertSecondsToTime(seconds) :string {
         // Convert milliseconds remaining to minute and seconds remaining. 
-        var ticks = ticksInSecs / 1000;
+        var ticks = seconds / 1000;
         var hh = Math.floor(ticks / 3600);
         var mm = Math.floor((ticks % 3600) / 60);
         var ss = Math.floor(ticks % 60);
@@ -35,11 +35,11 @@
         return strDiget.length >= width ? strDiget : new Array(width - strDiget.length + 1).join('0') + strDiget;
     }
     DrawCountDown(): number {
-        var ticksLeft = this.GetRemaining(this.endTime);
-        if (ticksLeft < 0)
-            ticksLeft = 0;
+        var secondsLeft = this.GetRemaining(this.endTime);
+        if (secondsLeft < 0)
+            secondsLeft = 0;
 
-        var r = ticksLeft * 2 / (this.fromMinutes * 60 * 1000);
+        var r = secondsLeft * 2 / (this.fromMinutes * 60 * 1000);
 
         var ctx = this.canvas.getContext("2d");
 
@@ -72,9 +72,9 @@
         ctx.strokeStyle = "#FFFFFF";
         ctx.font = "30px Helvetica";
         ctx.textAlign = 'center';
-        ctx.strokeText(this.TicksToTime(ticksLeft), 100, 110);
+        ctx.strokeText(this.ConvertSecondsToTime(secondsLeft), 100, 110);
 
-        return ticksLeft;
+        return secondsLeft;
     }
     StartTimer(_this: CountDown) {
         var tLeft = _this.DrawCountDown();
