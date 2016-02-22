@@ -5,21 +5,25 @@
     fromMinutes: number;
     canvas: any;
     callback: Function;
+
     constructor(canvasElm: any, fromMin: number, callback: Function) {
         this.canvas = canvasElm;
         this.fromMinutes = fromMin;
         this.callback = callback;
     }
+
     GetEndTime(fromMin: number): Date {
         var endTime = new Date();
         endTime.setMinutes(endTime.getMinutes() + fromMin);
         return endTime;
     }
+
     GetRemaining(endTime: Date): number {
         var curTime = new Date();
         var runTime = Number(endTime) - Number(curTime);
         return runTime;
     }
+
     ConvertSecondsToTime(seconds) :string {
         // Convert milliseconds remaining to minute and seconds remaining. 
         var ticks = seconds / 1000;
