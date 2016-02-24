@@ -22,7 +22,7 @@
             </td>
             <td>
                 <a asp-action="StartTimer" asp-route-id="@act.ID" class="starttimer" data-ajax="true" data-toggle="modal" data-target="#dialog">
-                    <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                    <span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span>
                 </a>
                 <a asp-action="Edit" asp-route-id="@act.ID" class="edit" data-ajax="true" data-toggle="modal" data-target="#dialog">
                     @Html.DisplayFor(modelItem => act.Description)
