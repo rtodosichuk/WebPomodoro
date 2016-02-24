@@ -72,11 +72,11 @@
         ctx.fill();
 
         //Draw time ramaining text.
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = "#FFFFFF";
-        ctx.font = "30px Helvetica";
+        ctx.lineWidth = 1;
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = "bold 38px Helvetica";
         ctx.textAlign = 'center';
-        ctx.strokeText(this.ConvertSecondsToTime(secondsLeft), 100, 110);
+        ctx.fillText(this.ConvertSecondsToTime(secondsLeft), 100, 115);
 
         return secondsLeft;
     }
