@@ -128,5 +128,14 @@ namespace WebPomodoro.Controllers
                 return PartialView(activity);
             }
         }
+
+        public JsonResult tasks()
+        {
+            return Json(new {
+                task1 = new { isDone = false, description = "First Task" },
+                task2 = new { isDone = true, description = "Second Task" },
+                task3 = new { isDone = false, description = "Third Task" },
+            });
+        }
     }
 }

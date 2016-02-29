@@ -1,0 +1,210 @@
+﻿@{
+    ViewData["Title"] = "ToDo List";
+}
+
+<h2>TODO TODAY</h2>
+<p>Activity that I need to do.</p>
+<form class="form-inline" data-bind="submit: addTask">
+    <div class="form-group" data-bind="css: {'has-error': newTaskText.hasError}">
+        <input type="text" data-bind="value: newTaskText" class="form-control" placeholder="Add task...." />
+        <button id="btnAddTask" type="submit" class="btn btn-primary">
+            <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Add Activity
+        </button>
+        <br />
+        <label class="control-label" data-bind="visible: newTaskText.hasError, text: newTaskText.validationMessage"></label>
+    </div>
+</form>
+<p></p>
+<ul class="list-group" data-bind="foreach: tasks, visible:tasks().length > 0">
+    <li class="list-group-item tbl-row">
+        <div class="row">
+            <div class="col-xs-10">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <a href="" data-bind="text: description, css: {done: isDone()}, click: $root.editTask"></a>
+                    </div>
+                    <div class="col-xs-12">
+                        <a href="" class="select" data-bind="click: $root.testfn">
+                            <span class="glyphicon glyphicon-play"></span>
+                        </a>
+                        <a href="" class="select" data-bind="click: $root.toogleComplete">
+                            <span class="glyphicon glyphicon-check"></span>
+                        </a>
+                        <a href="" class="select" data-bind="click: $root.removeTask">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-2">
+                <span class="badge" data-bind="text: strInterrupted"></span>
+                <span class="badge" data-bind="text: strComplete"></span><br />
+                <span class="badge" data-bind="text: strAbandoned"></span>
+            </div>
+        </div>
+    </li>
+</ul>
+
+
+<div class="modal fade" id="editdialog" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content" data-bind="with: selectedTask">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Edit Task</h4>
+            </div>
+            <div class="modal-body">
+                <form id="frmEdit" class="form-horizontal">
+                    <div class="form-group">
+                        <label for="txtDesc" class="control-label col-md-2">Description</label>
+                        <input type="text" class="form-control col-md-8" data-bind="value: description" />
+                    </div>
+                    <div class="checkbox col-md-offset-2">
+                        <label class="control-label"><input id="checkDone" type="checkbox" data-bind="checked: isDone" />Is Done</label>
+                    </div>
+                </form>
+                <div class="clearfix"></div>
+            </div>
+            <div class="modal-footer">
+                <button id="btnOk" type="button" class="btn btn-primary" data-bind="click: $root.saveTask">OK</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="mydialog" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <span>this is a test.</span>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<button id="btntest" class="btn btn-primary" data-bind="click: $root.testfn">test</button>
+
+@section scripts{
+    <script>
+        function Task(data) {
+            var self = this;
+            self.isDone = ko.observable(data.isDone);
+            self.description = ko.observable(data.description).extend({ required: "Please enter a description" });
+            self.interrupted = ko.observable(data.interrupted);
+            self.abandoned = ko.observable(data.abandoned);
+            self.complete = ko.observable(data.complete);
+
+            self.strInterrupted = ko.computed(function () {
+                var strInterrupted = "", i;
+
+                for (i = 0; i < Number(self.interrupted()) ; i++) {
+                    strInterrupted += "' ";
+                }
+
+                return strInterrupted;
+            });
+
+            self.strComplete = ko.computed(function () {
+                var strComplete = "", i;
+
+                for (i = 0; i < Number(self.complete()) ; i++) {
+                    strComplete += "X ";
+                }
+
+                return strComplete;
+            });
+
+            self.strAbandoned = ko.computed(function () {
+                var strAbandoned = "", i;
+
+                for (i = 0; i < Number(self.abandoned()) ; i++) {
+                    strAbandoned += "- ";
+                }
+
+                return strAbandoned;
+            });
+        }
+
+        function TaskListViewModel() {
+            var self = this;
+            self.tasks = ko.observableArray([]);
+            self.newTaskText = ko.observable().extend({ required: "Please enter a task" });
+            self.selectedTask = ko.observable();
+            self.incompleteTasks = ko.computed(function () {
+                return ko.utils.arrayFilter(self.tasks(), function (task) { return !task.isDone() });
+            });
+
+            // Operations
+            self.addTask = function () {
+                if (!self.newTaskText.hasError) {
+                    self.tasks.push(new Task({ description: this.newTaskText() }));
+                    self.newTaskText("");
+                }
+            };
+
+            self.editTask = function (item) {
+                self.selectedTask(item);
+                $('#editdialog').modal('show');
+            };
+
+            self.saveTask = function () {
+                //alert("Saving" + ko.toJSON(self.selectedTask));
+                self.selectedTask(null);
+                $('#editdialog').modal('hide');
+                console.log("saveTask was called.");
+            };
+
+            self.testfn = function (item) {
+                $('#mydialog').modal('show');
+            };
+
+            self.toogleComplete = function (task) {
+                if (task.isDone())
+                    task.isDone(false);
+                else
+                    task.isDone(true);
+            };
+
+            self.removeTask = function (task) { self.tasks.remove(task) };
+
+            // Load initial state from server, convert it to Task instances, then populate self.tasks
+            $.getJSON("/todo/tasks", function (allData) {
+                var mappedTasks = $.map(allData, function (item) { return new Task(item) });
+                self.tasks(mappedTasks);
+            });
+        }
+
+        //http://knockoutjs.com/documentation/extenders.html
+        ko.extenders.required = function (target, overrideMessage) {
+            //add some sub-observables
+            target.hasError = ko.observable();
+            target.validationMessage = ko.observable();
+
+            //define a function to do validation
+            function validate(newValue) {
+                target.hasError(newValue ? false : true);
+                target.validationMessage(newValue ? "" : overrideMessage || "This field is required");
+            }
+            //initialize validation
+            validate(target());
+
+            //validate whenever the value changes
+            target.subscribe(validate);
+
+            //return the original observable
+            return target;
+        };
+
+        closeMod = function () {
+            $("#divMod").remove();
+        }
+
+        $(function () {
+            //document is ready.
+            ko.applyBindings(new TaskListViewModel());
+        });
+    </script>
+}

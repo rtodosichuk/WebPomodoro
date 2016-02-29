@@ -32,3 +32,16 @@ textarea {
         z-index: 10 !important;
     }
 }
+
+.select {
+    visibility: hidden;
+}
+
+.tbl-row:hover .select {
+    visibility: visible;
+}
+
+.done {
+    text-decoration: line-through;
+    font-style: italic;
+}

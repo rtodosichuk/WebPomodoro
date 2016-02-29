@@ -106,7 +106,7 @@ namespace WebPomodoro
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Activity}/{action=Index}/{id?}");
+                    template: "{controller=todo}/{action=Index}/{id?}");
             });
 
             //app.UseDirectoryBrowser();
