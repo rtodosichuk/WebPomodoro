@@ -48,7 +48,7 @@
 
 <div class="modal fade" id="editdialog" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
     <div class="modal-dialog">
-        <div class="modal-content" data-bind="with: selectedTask">
+        <div class="modal-content" data-bind="with: editingTask">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title">Edit Task</h4>
@@ -89,7 +89,7 @@
 
 @section scripts{
     <script>
-        function Task(data) {
+        var Task = function(data) {
             var self = this;
             self.isDone = ko.observable(data.isDone);
             self.description = ko.observable(data.description).extend({ required: "Please enter a description" });
@@ -128,31 +128,65 @@
             });
         }
 
+        ko.utils.extend(Task.prototype, {
+            update: function (data) {
+                self = this;
+                self.isDone(data.isDone);
+                self.description(data.description);
+                self.interrupted(data.interrupted);
+                self.abandoned(data.abandoned);
+                self.complete(data.complete);
+            }
+        });
+
         function TaskListViewModel() {
             var self = this;
             self.tasks = ko.observableArray([]);
             self.newTaskText = ko.observable().extend({ required: "Please enter a task" });
             self.selectedTask = ko.observable();
+            self.editingTask = ko.observable();
             self.incompleteTasks = ko.computed(function () {
                 return ko.utils.arrayFilter(self.tasks(), function (task) { return !task.isDone() });
             });
 
             // Operations
             self.addTask = function () {
-                if (!self.newTaskText.hasError) {
+                debugger;
+                if (self.validate(self.newTaskText)) {
                     self.tasks.push(new Task({ description: this.newTaskText() }));
                     self.newTaskText("");
                 }
             };
 
+            self.validate = function (item) {
+                debugger;
+                var text = self.newTaskText();
+
+                if (text === undefined || text === '') {
+                    return false;
+                }
+                    
+                return true;
+            }
+
             self.editTask = function (item) {
                 self.selectedTask(item);
+                self.editingTask(new Task(ko.toJS(item)));
+               
                 $('#editdialog').modal('show');
             };
-
-            self.saveTask = function () {
+            
+            self.saveTask = function (item) {
                 //alert("Saving" + ko.toJSON(self.selectedTask));
+
+                var selected = self.selectedTask(),
+                    edited = ko.toJS(self.editingTask);
+
+                selected.update(edited);
+                                
                 self.selectedTask(null);
+                self.editingTask(null);
+                
                 $('#editdialog').modal('hide');
                 console.log("saveTask was called.");
             };
