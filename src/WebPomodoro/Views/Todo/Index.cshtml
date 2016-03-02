@@ -5,13 +5,12 @@
 <h2>TODO TODAY</h2>
 <p>Activity that I need to do.</p>
 <form class="form-inline" data-bind="submit: addTask">
-    <div class="form-group" data-bind="css: {'has-error': newTaskText.hasError}">
+    <div class="form-group">
         <input type="text" data-bind="value: newTaskText" class="form-control" placeholder="Add task...." />
         <button id="btnAddTask" type="submit" class="btn btn-primary">
             <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Add Activity
         </button>
         <br />
-        <label class="control-label" data-bind="visible: newTaskText.hasError, text: newTaskText.validationMessage"></label>
     </div>
 </form>
 <p></p>
@@ -84,15 +83,12 @@
     </div>
 </div>
 
-
-<button id="btntest" class="btn btn-primary" data-bind="click: $root.testfn">test</button>
-
 @section scripts{
     <script>
         var Task = function(data) {
             var self = this;
             self.isDone = ko.observable(data.isDone);
-            self.description = ko.observable(data.description).extend({ required: "Please enter a description" });
+            self.description = ko.observable(data.description);
             self.interrupted = ko.observable(data.interrupted);
             self.abandoned = ko.observable(data.abandoned);
             self.complete = ko.observable(data.complete);
@@ -152,22 +148,11 @@
             // Operations
             self.addTask = function () {
                 debugger;
-                if (self.validate(self.newTaskText)) {
-                    self.tasks.push(new Task({ description: this.newTaskText() }));
+                if (self.newTaskText() !== undefined && self.newTaskText() !== "") {
+                    self.tasks.push(new Task({ description: self.newTaskText() }));
                     self.newTaskText("");
                 }
             };
-
-            self.validate = function (item) {
-                debugger;
-                var text = self.newTaskText();
-
-                if (text === undefined || text === '') {
-                    return false;
-                }
-                    
-                return true;
-            }
 
             self.editTask = function (item) {
                 self.selectedTask(item);
@@ -177,18 +162,19 @@
             };
             
             self.saveTask = function (item) {
-                //alert("Saving" + ko.toJSON(self.selectedTask));
+                if (self.newTaskText() !== undefined && self.newTaskText() !== "") {
+                    //alert("Saving" + ko.toJSON(self.selectedTask));
 
-                var selected = self.selectedTask(),
-                    edited = ko.toJS(self.editingTask);
+                    var selected = self.selectedTask(),
+                        edited = ko.toJS(self.editingTask);
 
-                selected.update(edited);
-                                
-                self.selectedTask(null);
-                self.editingTask(null);
-                
-                $('#editdialog').modal('hide');
-                console.log("saveTask was called.");
+                    selected.update(edited);
+
+                    self.selectedTask(null);
+                    self.editingTask(null);
+
+                    $('#editdialog').modal('hide');
+                }
             };
 
             self.testfn = function (item) {
