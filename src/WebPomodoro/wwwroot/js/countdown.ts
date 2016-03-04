@@ -49,6 +49,13 @@
 
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+        //Draw shadow for time remaining circle.
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = "#fafafa";
+        ctx.beginPath();
+        ctx.arc(100, 100, 80, 0, 2 * Math.PI);
+        ctx.stroke();
+
         //Draw outer time remaining circle.
         ctx.lineWidth = 10;
         //ctx.strokeStyle = "#880000";

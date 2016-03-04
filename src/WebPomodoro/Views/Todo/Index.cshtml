@@ -275,7 +275,7 @@
             self.startCountdown = function (item) {
                 self.selectedTask(item);
 
-                self.countDown = new CountDown(document.getElementById("myCanvas"), 25, self.countDownDone)
+                self.countDown = new CountDown(document.getElementById("myCanvas"), 1, self.countDownDone)
                 self.countDown.Start();
                 $('#mydialog').modal('show');
             };
