@@ -4,6 +4,7 @@
 
 <h2>TODO TODAY</h2>
 <p>Activity that I need to do.</p>
+<input type="hidden" id="hdnSaveURL" value="@Url.Action("Save", "Todo")" />
 <form class="form-inline" data-bind="submit: addTask">
     <div class="form-group">
         <input type="text" data-bind="value: newTaskText" class="form-control" placeholder="Add task...." />
@@ -14,22 +15,22 @@
     </div>
 </form>
 <p></p>
-<ul class="list-group" data-bind="foreach: tasks, visible:tasks().length > 0">
+<ul id="taskList" class="list-group" data-bind="foreach: tasks, visible:tasks().length > 0">
     <li class="list-group-item tbl-row">
         <div class="row">
             <div class="col-xs-10">
                 <div class="row">
                     <div class="col-xs-12">
-                        <a href="" data-bind="text: description, css: {done: isDone()}, click: $root.editTask"></a>
+                        <a href="" data-bind="text: Description, css: {done: IsDone()}, click: $root.editTask"></a>
                     </div>
                     <div class="col-xs-12">
-                        <a href="" class="select" data-bind="click: $root.testfn">
+                        <a href="" class="select" data-bind="click: $root.startCountdown">
                             <span class="glyphicon glyphicon-play"></span>
                         </a>
-                        <a href="" class="select" data-bind="click: $root.toogleComplete">
+                        <a href="" class="select" data-bind="click: $root.toogleIsDone">
                             <span class="glyphicon glyphicon-check"></span>
                         </a>
-                        <a href="" class="select" data-bind="click: $root.removeTask">
+                        <a href="" class="select" data-bind="click: $root.deleteTask">
                             <span class="glyphicon glyphicon-trash"></span>
                         </a>
                     </div>
@@ -37,7 +38,7 @@
             </div>
             <div class="col-xs-2">
                 <span class="badge" data-bind="text: strInterrupted"></span>
-                <span class="badge" data-bind="text: strComplete"></span><br />
+                <span class="badge" data-bind="text: strCompleted"></span><br />
                 <span class="badge" data-bind="text: strAbandoned"></span>
             </div>
         </div>
@@ -56,16 +57,16 @@
                 <form id="frmEdit" class="form-horizontal">
                     <div class="form-group">
                         <label for="txtDesc" class="control-label col-md-2">Description</label>
-                        <input type="text" class="form-control col-md-8" data-bind="value: description" />
+                        <input type="text" class="form-control col-md-8" data-bind="value: Description" />
                     </div>
                     <div class="checkbox col-md-offset-2">
-                        <label class="control-label"><input id="checkDone" type="checkbox" data-bind="checked: isDone" />Is Done</label>
+                        <label class="control-label"><input id="checkDone" type="checkbox" data-bind="checked: IsDone" />Is Done</label>
                     </div>
                 </form>
                 <div class="clearfix"></div>
             </div>
             <div class="modal-footer">
-                <button id="btnOk" type="button" class="btn btn-primary" data-bind="click: $root.saveTask">OK</button>
+                <button id="btnOk" type="button" class="btn btn-primary" data-bind="click: $root.updateTask">OK</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
             </div>
         </div>
@@ -74,10 +75,55 @@
 
 <div class="modal fade" id="mydialog" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content" data-bind="with: selectedTask">
             <div class="modal-body">
-                <span>this is a test.</span>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <div class="row">
+                    <h2 class="text-center">
+                        <strong data-bind="text: Description"></strong>
+                    </h2>
+                </div>
+                <div class="row">
+                    <div class="col-xs-offset-3 col-xs-6">
+                        <div class="text-center">
+                            <canvas id="myCanvas" width=200 height=200></canvas>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-offset-3 col-xs-6">
+                            <div class="row">
+                                <div class="col-xs-6 text-center">
+                                    <a id="btnInterrupt" class="btn btn-primary" data-bind="click: $root.inturruptTask">Interruption</a>
+                                </div>
+                                <div class="col-xm-6 text-center">
+                                    <a id="btnAbandon" class="btn btn-danger" data-bind="click: $root.abandonTask">Abandoned</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div id="divInerruptedTask" class="row hidden">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="col-xs-offset-3">
+                                    <button type="button" class="close" aria-hidden="true" data-bind="click: $root.closeInturruptTask">&times;</button>
+                                </div>
+                                <div class="col-xs-offset-3 col-xs-10" data-bind="with: $parent.editingTask">
+                                    <form class="form-inline">
+                                        <div class="form-group">
+                                            <input type="text" data-bind="value: Description" class="form-control" placeholder="Add task...." />
+                                            <button id="btnAddTask" type="submit" class="btn btn-primary" data-bind="click: $root.addInterruptedTask">
+                                                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Add Activity
+                                            </button>
+                                            <div class="checkbox col-xs-offset-1">
+                                                <label class="control-label"><input id="checkDone" type="checkbox" data-bind="checked: IsDone" /> Is Done</label>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -85,38 +131,39 @@
 
 @section scripts{
     <script>
-        var Task = function(data) {
+        var Task = function (data) {
             var self = this;
-            self.isDone = ko.observable(data.isDone);
-            self.description = ko.observable(data.description);
-            self.interrupted = ko.observable(data.interrupted);
-            self.abandoned = ko.observable(data.abandoned);
-            self.complete = ko.observable(data.complete);
+            self.ID = ko.observable(data.ID);
+            self.IsDone = ko.observable(data.IsDone);
+            self.Description = ko.observable(data.Description);
+            self.Interrupted = ko.observable(data.Interrupted);
+            self.Abandoned = ko.observable(data.Abandoned);
+            self.Completed = ko.observable(data.Completed);
 
             self.strInterrupted = ko.computed(function () {
                 var strInterrupted = "", i;
 
-                for (i = 0; i < Number(self.interrupted()) ; i++) {
+                for (i = 0; i < Number(self.Interrupted()) ; i++) {
                     strInterrupted += "' ";
                 }
 
                 return strInterrupted;
             });
 
-            self.strComplete = ko.computed(function () {
-                var strComplete = "", i;
+            self.strCompleted = ko.computed(function () {
+                var strCompleted = "", i;
 
-                for (i = 0; i < Number(self.complete()) ; i++) {
-                    strComplete += "X ";
+                for (i = 0; i < Number(self.Completed()) ; i++) {
+                    strCompleted += "X ";
                 }
 
-                return strComplete;
+                return strCompleted;
             });
 
             self.strAbandoned = ko.computed(function () {
                 var strAbandoned = "", i;
 
-                for (i = 0; i < Number(self.abandoned()) ; i++) {
+                for (i = 0; i < Number(self.Abandoned()) ; i++) {
                     strAbandoned += "- ";
                 }
 
@@ -127,11 +174,11 @@
         ko.utils.extend(Task.prototype, {
             update: function (data) {
                 self = this;
-                self.isDone(data.isDone);
-                self.description(data.description);
-                self.interrupted(data.interrupted);
-                self.abandoned(data.abandoned);
-                self.complete(data.complete);
+                self.IsDone(data.IsDone);
+                self.Description(data.Description);
+                self.Interrupted(data.Interrupted);
+                self.Abandoned(data.Abandoned);
+                self.Completed(data.Completed);
             }
         });
 
@@ -142,14 +189,15 @@
             self.selectedTask = ko.observable();
             self.editingTask = ko.observable();
             self.incompleteTasks = ko.computed(function () {
-                return ko.utils.arrayFilter(self.tasks(), function (task) { return !task.isDone() });
+                return ko.utils.arrayFilter(self.tasks(), function (task) { return !task.IsDone() });
             });
+            self.countDown;
 
             // Operations
             self.addTask = function () {
-                debugger;
                 if (self.newTaskText() !== undefined && self.newTaskText() !== "") {
-                    self.tasks.push(new Task({ description: self.newTaskText() }));
+                    self.tasks.push(new Task({ Description: self.newTaskText() }));
+                    self.saveTask(self.tasks()[self.tasks().length - 1]);
                     self.newTaskText("");
                 }
             };
@@ -157,18 +205,18 @@
             self.editTask = function (item) {
                 self.selectedTask(item);
                 self.editingTask(new Task(ko.toJS(item)));
-               
+
                 $('#editdialog').modal('show');
             };
-            
-            self.saveTask = function (item) {
-                if (self.newTaskText() !== undefined && self.newTaskText() !== "") {
-                    //alert("Saving" + ko.toJSON(self.selectedTask));
 
+            self.updateTask = function (item) {
+                if (item.Description !== undefined && item.Description() !== "") {
                     var selected = self.selectedTask(),
                         edited = ko.toJS(self.editingTask);
 
                     selected.update(edited);
+
+                    self.saveTask(item);
 
                     self.selectedTask(null);
                     self.editingTask(null);
@@ -177,18 +225,112 @@
                 }
             };
 
-            self.testfn = function (item) {
+            self.saveTask = function (item, msg) {
+                if (item.Description !== undefined && item.Description() !== "") {
+
+                    $.ajax({
+                        type: "POST",
+                        url: $("#hdnSaveURL").val(),
+                        data: {
+                            ID: item.ID(),
+                            Description: item.Description(),
+                            Interrupted: item.Interrupted(),
+                            Abandoned: item.Abandoned(),
+                            Completed: item.Completed(),
+                            IsDone: item.IsDone()
+                        },
+                        success: function (result) {
+                            if (msg !== undefined) {
+                                alert(msg);
+                            }
+                            if (result.id !== undefined && result.id !== "") {
+                                item.ID(result.id);
+                            }
+                        },
+                        error: function () { alert("Error"); }
+                    });
+                }
+            };
+
+            self.deleteTask = function (item) {
+                if (item.ID !== undefined && item.ID() > 0) {
+
+                    var data = {
+                        ID: item.ID(),
+                        Description: item.Description(),
+                        Interrupted: item.Interrupted(),
+                        Abandoned: item.Abandoned(),
+                        Completed: item.Completed(),
+                        IsDone: item.IsDone()
+                    };
+
+                    $.post("Todo/Delete", data,
+                        function () {
+                            self.tasks.remove(item);
+                            alert("Task was deleted.");
+                        });
+                }
+            }
+
+            self.startCountdown = function (item) {
+                self.selectedTask(item);
+
+                self.countDown = new CountDown(document.getElementById("myCanvas"), 25, self.countDownDone)
+                self.countDown.Start();
                 $('#mydialog').modal('show');
             };
 
-            self.toogleComplete = function (task) {
-                if (task.isDone())
-                    task.isDone(false);
-                else
-                    task.isDone(true);
+            self.countDownDone = function () {
+                var task = self.selectedTask();
+
+                task.Completed($.isNumeric(task.Completed()) ? task.Completed() + 1 : 1);
+                self.saveTask(task, "Pomodoro is done. Take a break.");
+                $('#mydialog').modal('hide');
             };
 
-            self.removeTask = function (task) { self.tasks.remove(task) };
+            self.abandonTask = function (item) {
+                if (confirm("Are you sure you want to abandon this pomodoro?")) {
+                    self.countDown.Stop();
+                    item.Abandoned($.isNumeric(item.Abandoned()) ?  item.Abandoned() + 1 : 1);
+                    self.saveTask(item);
+                    $('#mydialog').modal('hide');
+                }
+            }
+
+            self.inturruptTask = function (item) {
+                self.editingTask(new Task({
+                    Abandoned: 0,
+                    Completed: 0,
+                    Description: "",
+                    ID: 0,
+                    Interrupted: 0,
+                    IsDone: false,
+                }));
+
+                $("#divInerruptedTask").removeClass("hidden");
+
+                item.Interrupted($.isNumeric(item.Interrupted()) ? item.Interrupted() + 1 : 1);
+                self.saveTask(item);
+            };
+
+            self.addInterruptedTask = function (item) {
+                
+                self.tasks.push(new Task(ko.toJS(self.editingTask())));
+                self.saveTask(self.tasks()[self.tasks().length - 1]);
+
+                self.editingTask("");
+                
+                $("#divInerruptedTask").addClass("hidden");
+            };
+            
+            self.closeInturruptTask = function () {
+                $("#divInerruptedTask").addClass("hidden");
+            }
+
+            self.toogleIsDone = function (task) {
+                task.IsDone(!task.IsDone());
+                self.saveTask(task);
+            };
 
             // Load initial state from server, convert it to Task instances, then populate self.tasks
             $.getJSON("/todo/tasks", function (allData) {
@@ -225,6 +367,7 @@
         $(function () {
             //document is ready.
             ko.applyBindings(new TaskListViewModel());
+            $("#taskList").sortable();
         });
     </script>
 }

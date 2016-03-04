@@ -41,21 +41,21 @@ var CountDown = (function () {
         ctx.beginPath();
         ctx.arc(100, 100, 80, .5 * Math.PI, (r + .5) * Math.PI);
         ctx.stroke();
-        //Draw outer border circle.
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = "#286090";
-        ctx.beginPath();
-        ctx.arc(100, 100, 88, 0, 2 * Math.PI);
-        ctx.stroke();
-        //Draw inner circle.
-        ctx.fillStyle = "#286090";
-        ctx.beginPath();
-        ctx.arc(100, 100, 73, 0, 2 * Math.PI);
-        ctx.closePath();
-        ctx.fill();
+        ////Draw outer border circle.
+        //ctx.lineWidth = 1;
+        //ctx.strokeStyle = "#286090";
+        //ctx.beginPath();
+        //ctx.arc(100, 100, 88, 0, 2 * Math.PI);
+        //ctx.stroke();
+        ////Draw inner circle.
+        //ctx.fillStyle = "#286090";
+        //ctx.beginPath();
+        //ctx.arc(100, 100, 73, 0, 2 * Math.PI);
+        //ctx.closePath();
+        //ctx.fill();
         //Draw time ramaining text.
         ctx.lineWidth = 1;
-        ctx.fillStyle = "#FFFFFF";
+        ctx.fillStyle = "#286090";
         ctx.font = "bold 38px Helvetica";
         ctx.textAlign = 'center';
         ctx.fillText(this.ConvertSecondsToTime(secondsLeft), 100, 115);

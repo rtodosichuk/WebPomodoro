@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WebPomodoro.Models;
 using WebPomodoro.Services;
+using Microsoft.AspNet.StaticFiles;
 
 namespace WebPomodoro
 {
@@ -96,7 +97,12 @@ namespace WebPomodoro
 
             app.UseApplicationInsightsExceptionTelemetry();
 
-            app.UseStaticFiles();
+
+            // RJT add "Expires" header to static files. 
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                OnPrepareResponse = r => r.Context.Response.Headers.Add("Expires", DateTime.Now.AddDays(7).ToUniversalTime().ToString("r"))
+            });
 
             app.UseIdentity();
 

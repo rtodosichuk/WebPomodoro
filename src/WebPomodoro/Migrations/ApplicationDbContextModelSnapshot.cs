@@ -103,11 +103,19 @@ namespace WebPomodoro.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int>("Abandoned");
+
                     b.Property<DateTime>("ActivityDate");
+
+                    b.Property<int>("Completed");
 
                     b.Property<string>("Description");
 
                     b.Property<DateTime>("DueDate");
+
+                    b.Property<int>("Interrupted");
+
+                    b.Property<bool>("IsDone");
 
                     b.Property<string>("Place");
 
